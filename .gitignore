@@ -1,0 +1,9 @@
+out/
+*.asv
+*.mat
+*.fig
+*.png
+*.csv
+*.json
+.DS_Store
+
