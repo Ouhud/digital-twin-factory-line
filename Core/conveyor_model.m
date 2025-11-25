@@ -92,7 +92,7 @@ B.load     = @load;
             return;
         end
 
-        tol = 0.03;  % Toleranz (3 cm)
+        tol = 0.1;  % Toleranz (10 cm)
         pos = [B1.items.pos];
         tf = any(abs(pos - x_at) <= tol);
     end
@@ -118,7 +118,7 @@ B.load     = @load;
             return;
         end
 
-        tol = 0.03;
+        tol = 0.1;
         pos = [B1.items.pos];
         idx = find(abs(pos - x_at) <= tol, 1, 'first');
 

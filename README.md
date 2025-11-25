@@ -5,450 +5,620 @@
 
 ## 📘 Projektbeschreibung
 
-Dieses MATLAB-Projekt modelliert und simuliert eine **digitale Fertigungslinie (Digital Twin Factory Line)** mit Förderbändern, Maschinen und kollaborierenden Robotern.  
-Es dient sowohl der **industriellen Weiterentwicklung** (für Entwicklerteams) als auch der **wissenschaftlichen Analyse** im Rahmen von Hochschulprojekten.
+Dieses MATLAB-Projekt modelliert und simuliert eine **digitale Fertigungslinie (Digital Twin Factory Line)** mit Förderbändern, Maschinen und kollaborierenden Robotern gemäß **Pflichtenheft**.
 
-Ziel des Projekts ist die Abbildung einer realen Produktionsumgebung als **Digital Twin** zur Untersuchung von:
-- Material- und Informationsflüssen,  
-- Prozesszeiten und Zykluszeiten,  
-- Ressourcenauslastungen und Effizienz (KPIs),  
-- sowie zur **Visualisierung** und **Optimierung** komplexer Fertigungssysteme.
-
-Das Projekt ist modular aufgebaut: jede Funktion, jeder Roboter, jede Maschine und jedes Förderband ist als eigenständiges MATLAB-Modul implementiert.
+Das Projekt dient sowohl der **industriellen Weiterentwicklung** als auch der **wissenschaftlichen Analyse** im Rahmen von Hochschulprojekten.
 
 ---
 
-## 📂 Verzeichnisstruktur
+## 🎯 Workflow (Pflichtenheft-konform)
 
-| Ordner | Beschreibung |
-|--------|---------------|
-| **Core/** | Kernmodule der Simulation: Maschinen, Roboter, Förderband, Puffer, Konfiguration und Basissimulation. |
-| **digital-twin/** | Steuerlogik, Hauptsimulationen und Datenanalyse der digitalen Zwillinge. |
-| **helpers/** | Hilfsfunktionen wie Pfad-Management, Snapshot-Erstellung, Namens- und Zeitformatierung. |
-| **io/** | Kommunikationsschnittstellen (OPC UA, ROS, Logging). |
-| **kpi/** | Kennzahlen-Berechnung (Durchsatz, Auslastung, Verfügbarkeit, Performance). |
-| **viz/** | Visualisierung (2D- und 3D-Szenen, Animationen). |
-| **reports/** | Automatische Berichtserstellung mit KPI-Grafiken und Übersichten. |
-| **demos/** | Beispielsimulationen für verschiedene Layouts (1 Band, 2 Bänder, 2 Lager usw.). |
-| **out/** | Ausgabeordner für CSV-, MAT- und Grafikdateien. |
-| **startup_project.m** | Initialisiert das Projekt (Pfad-Setup, Standardparameter, Addpath-Konfiguration). |
-
----
-
-## ⚙️ Hauptskripte und ihre Funktion
-
-| Datei | Funktion |
-|-------|-----------|
-| `startup_project.m` | Initialisiert das MATLAB-Projekt, fügt alle Unterordner dem Pfad hinzu und überprüft Abhängigkeiten. |
-| `digital-twin/run_all.m` | Führt alle Simulationen sequentiell aus (Benchmark- oder Vergleichsläufe). |
-| `digital-twin/run_sim.m` | Startet eine Einzelsimulation mit Standardparametern. |
-| `digital-twin/run_doe.m` | Führt ein **Design-of-Experiments (DoE)** durch, um Einflussgrößen systematisch zu variieren. |
-| `demos/simulate_factory_line.m` | Simulation einer Standardlinie mit einem Förderband, zwei Maschinen und drei Robotern. |
-| `demos/simulate_factory_line_2belts.m` | Simulation mit zwei parallelen Förderbändern und drei Robotern. |
-| `demos/simulate_factory_line_2stores.m` | Simulation mit zwei separaten Ausgangslagern für Materialtrennung. |
-| `Core/simulate.m` | Zentrales Simulations-Framework: verwaltet Hauptschleife, Ereignisse und Zustandsfortschreibung. |
-
----
-
-## 🧩 Wichtige Funktionsmodule (Core)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| **config.m** | Erstellt die vollständige Simulationskonfiguration (Zeitschritt `dt`, Laufzeit `Tsim`, Bandgeschwindigkeit, Prozesszeiten usw.). |
-| **fsm_machine.m** | Zustandsmaschine einer Maschine – steuert Phasen *Idle → Processing → Done*. |
-| **fsm_robot.m** | Zustandsmaschine eines Roboters – definiert Rollen wie *Supply*, *Collect*, *Ship* und deren Übergänge. |
-| **buffer_store.m** | FIFO-Speicher für Material zwischen Prozessen; stellt Methoden `.push`, `.pop`, `.is_empty` bereit. |
-| **conveyor_model.m** | Simuliert ein Förderband mit Bewegung der Werkstücke entlang vordefinierter Stationen. |
-| **material_source.m / material_source_step.m** | Erzeugt neue Teile (Spawn-Rate) und legt sie im Eingabepuffer ab. |
-| **kinematics_3R_planar.m** | Beispiel einer 3R-Planar-Roboterkinematik zur Positionierung. |
-| **plot_source_buffer.m** | Visualisiert aktuelle Zustände von Quellen und Puffern im Diagramm. |
-| **simulate.m** | Übergeordnete Steuerung der Simulationsschleife – Verwaltung von Zeit, Ereignissen und Zuständen. |
-
----
-
-## 📊 KPI-Module (Key Performance Indicators)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| `kpi_init.m` | Initialisiert alle Kennzahlenstrukturen (Durchsatz, Bearbeitungszeit, Auslastung). |
-| `kpi_update.m` | Aktualisiert KPI-Werte pro Simulationsschritt basierend auf Robotik- und Maschinenereignissen. |
-| `kpi_finalize.m` | Berechnet aggregierte KPIs (z. B. durchschnittlicher Durchsatz pro Minute). |
-| `export_kpi.m` | Exportiert KPI-Daten als `.csv`, `.mat` und `.json`. |
-| `pm_estimator.m` | Optionale Schätzung von Wartungsintervallen (Predictive Maintenance). |
-
----
-
-## 🖼️ Visualisierung (viz/)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| `draw_scene_2d.m` | Zeichnet eine zweidimensionale Ansicht der Fertigungslinie (Bänder, Maschinen, Roboter). |
-| `draw_scene_3d.m` | Erstellt eine dreidimensionale Szene zur erweiterten Visualisierung. |
-| `animate_step.m` | Führt die Animation schrittweise aus und zeigt aktuelle Positionen und Zustände. |
-
----
-
-## 🔌 I/O und Kommunikation (io/)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| `opcua_write.m` | Überträgt Simulationsdaten an eine OPC UA-Schnittstelle (z. B. Siemens MindSphere / TwinCAT). |
-| `ros_publish.m` | Publiziert Nachrichten über ROS 1 oder ROS 2 zur Integration mit realen Robotern. |
-| `logger.m` | Universelles Logging-System für Status- und Ereignisprotokolle. |
-
----
-
-## 🧠 Hilfsfunktionen (helpers/)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| `capture_sim_snapshot.m` | Speichert einen Schnappschuss des aktuellen Simulationszustands. |
-| `dir_last.m` | Gibt den zuletzt erstellten Unterordner eines Verzeichnisses zurück. |
-| `eta_in_window.m` | Berechnet die geschätzte Restzeit für laufende Simulationen. |
-| `scale_ptp_time.m` | Skaliert Bewegungszeiten zwischen Punkten (PTP-Profile). |
-| `util_nowstamp.m` | Erzeugt Zeitstempel (`yyyyMMdd_HHmmss`) für Dateibenennung. |
-| `util_basename.m` | Entfernt Pfadanteile aus Dateinamen. |
-| `util_find_out_dir.m` | Sucht automatisch das Ausgabeverzeichnis. |
-
----
-
-## 📈 Berichtserstellung (reports/)
-
-| Datei | Beschreibung |
-|--------|---------------|
-| `make_overview_figure.m` | Erstellt eine grafische Übersicht der Produktionslinie und KPIs. |
-| `make_overview_illustrated.m` | Generiert bebilderte Reports mit Diagrammen, Layout und Ergebniswerten. |
-
----
-
-## 🚀 Simulation starten
-
-### Option 1 – Interaktiv (MATLAB GUI)
-```matlab
->> startup_project
->> run_all
-
-
-
-
-## ⚙️ Ordner: Core/
-### Zweck
-Der Ordner **`Core/`** enthält die zentralen Basiskomponenten der digitalen Fabriklinie.  
-Alle dynamischen Entitäten wie Roboter, Maschinen, Förderbänder oder Puffer werden hier modelliert.  
-Diese Module sind unabhängig voneinander getestet und folgen einem einheitlichen API-Design mit klaren Methodenaufrufen (`.tick`, `.load`, `.unload`, `.push`, `.pop` etc.).
-
-Sie bilden das Fundament der gesamten Simulation und werden von fast allen anderen Modulen (z. B. `scheduler`, `kpi_update`, `simulate_factory_line_3R2M`) verwendet.
-
----
-
-### 🔹 Datei: `buffer_store.m`
-
-**Funktion:**  
-Implementiert einen **FIFO-Pufferspeicher** („First In – First Out“) für Werkstücke.  
-Er dient als Zwischenlager zwischen Materialquelle, Förderband und Maschine.
-
-**Aufbau & Methoden:**
-| Methode | Beschreibung |
-|----------|---------------|
-| `B.push(item)` | Fügt ein neues Element am Ende der Warteschlange hinzu. |
-| `B.pop()` | Entfernt und liefert das erste Element. |
-| `B.peek()` | Gibt das erste Element zurück, ohne es zu entfernen. |
-| `B.len()` / `B.count()` | Gibt die aktuelle Anzahl der gespeicherten Teile zurück. |
-| `B.is_empty()` | Prüft, ob der Puffer leer ist. |
-| `B.is_full()` | Prüft, ob der Puffer die maximale Kapazität erreicht hat. |
-
-**Parameter:**
-- `capacity` → maximale Anzahl gespeicherter Teile (`inf` = unbegrenzt)  
-- `name` → optionaler Name des Puffers (z. B. `"in"`, `"outA"`)
-
-**Rückgabe:**  
-Struktur `B` mit Queue-internen Daten (`.q`) und Methoden.
-
-**Verwendung:**  
-- Materialzufuhr (`material_source`) legt Teile ab.  
-- Roboter oder Maschinen entnehmen Teile über `pop()`.
-
-**Weiterentwicklung:**  
-- Erweiterbar mit Prioritäten oder FIFO/LIFO-Umschaltung.  
-- Logging-Optionen könnten integriert werden (z. B. Zeitstempel beim Push).  
-
----
-
-### 🔹 Datei: `config.m`
-
-**Funktion:**  
-Zentrale Erzeugung der **Simulationsparameter (Konfiguration)**.  
-Definiert Standardwerte für Zeit, Geschwindigkeit, Prozessparameter und Layout.
-
-**Parameter (Auszug):**
-| Parameter | Bedeutung | Standardwert |
-|------------|------------|--------------|
-| `Tsim` | Gesamte Simulationszeit [s] | 60 |
-| `dt` | Zeitschrittweite [s] | 0.05 |
-| `spawn_rate` | Materialzufuhr (Teile pro Sekunde) | 0.5 |
-| `belt_speed` | Geschwindigkeit des Förderbands [m/s] | 0.30 |
-| `belt_len` | Länge des Förderbands [m] | 2.0 |
-| `stations_pos` | Positionen der Maschinen entlang des Bands [m] | `[0.8, 1.4]` |
-| `machine_Tproc` | Bearbeitungszeit jeder Maschine [s] | `[4.0, 5.5]` |
-| `rob_move_time` | Dauer einer Roboterbewegung [s] | 0.8 |
-| `rob_action_time` | Dauer einer Pick/Place-Aktion [s] | 0.3 |
-| `showPlots` | 2D-Visualisierung aktivieren | true |
-| `show3D` | 3D-Visualisierung aktivieren | false |
-
-**Rückgabe:**  
-Struktur `C` mit allen Konfigurationsfeldern (direkt über `config(...)` abrufbar).
-
-**Verwendung:**  
-- Wird in jeder Simulation (`simulate_factory_line`, `scheduler`, `fsm_robot`) aufgerufen.  
-- Alle Submodule greifen auf dieselbe Struktur `C` zu.  
-
-**Weiterentwicklung:**  
-- Erweiterbar um zufällige Taktzeiten oder stochastische Modelle.  
-- Kann um Produktionslinienparameter (z. B. Energieverbrauch, Wartungsintervalle) ergänzt werden.
-
----
-
-### 🔹 Datei: `conveyor_model.m`
-
-**Funktion:**  
-Modelliert das **Förderband** zwischen den Stationen.  
-Es bewegt Werkstücke entlang definierter Positionen (`stations_pos`) und erlaubt das **Auflegen (load)** und **Entnehmen (take)** durch Roboter.
-
-**Parameter:**
-| Parameter | Bedeutung |
-|------------|------------|
-| `L` | Länge des Bands [m] |
-| `v` | Geschwindigkeit des Bands [m/s] |
-| `stations_pos` | Positionen der Stationen (Roboter/Maschinen) |
-
-**Hauptmethoden:**
-| Methode | Beschreibung |
-|----------|---------------|
-| `B.step(dt)` | Bewegt alle Teile entlang des Bands um `v * dt`. |
-| `B.can_pick(x_at)` | Prüft, ob an der Position `x_at` ein Teil liegt. |
-| `[B, part] = B.take(x_at)` | Entnimmt ein Teil an der Station `x_at`. |
-| `[B, ok] = B.load(part, x_at)` | Legt ein neues Teil auf das Band. |
-
-**Innere Logik:**  
-- Verwaltet alle Teile als Strukturarray (`B.items`).  
-- Jedes Teil besitzt Attribute: `id`, `pos`, `created_s`, `src`, `meta`.  
-- Toleranzbereich für Positionserkennung beträgt 3 cm (`tol = 0.03`).
-
-**Lokale Hilfsfunktionen:**
-- `normalize_item()` – Normalisiert Strukturen (id, pos, src).  
-- `align_fields()` – Stellt gleiche Feldreihenfolge zwischen Objekten sicher.
-
-**Verwendung:**  
-- Wird in allen Demo-Simulationen verwendet (1–2 Bänder).  
-- Roboter (R1–R3) greifen über `can_pick` und `take` auf Bandteile zu.  
-
-**Weiterentwicklung:**  
-- Integration von Bandstörungen oder Sensorverzögerungen.  
-- Erweiterung um mehrspurige Bänder oder Rückläufe.  
-- Unterstützung für mehrere parallele Bänder (Multi-Line).
-
----
-
-### 🔹 Datei: `fsm_machine.m`
-
-**Funktion:**  
-Definiert den **Zustandsautomaten einer Maschine** (Finite State Machine).  
-Die Maschine durchläuft die Phasen:  
-`idle → processing → done → idle`
-
-**Parameter:**
-| Parameter | Bedeutung |
-|------------|------------|
-| `id` | Maschinen-ID |
-| `Tproc` | Bearbeitungszeit [s] |
-
-**Wichtige Felder:**
-| Feld | Bedeutung |
-|-------|------------|
-| `state` | aktueller Zustand (`idle`, `processing`, `done`) |
-| `is_busy` | true, wenn Maschine belegt |
-| `done_flag` | true, wenn Bearbeitung abgeschlossen |
-| `part` | aktuell bearbeitetes Teil |
-| `stats.active` / `stats.idle` | kumulierte Zeitanteile |
-
-**Methoden:**
-| Methode | Beschreibung |
-|----------|---------------|
-| `M = M.tick(M, env, dt)` | Zeitfortschritt und Zustandswechsel. |
-| `[M, ok] = M.load(M, part)` | Neues Teil übernehmen und Bearbeitung starten. |
-| `[M, part] = M.unload(M)` | Fertiges Teil abgeben, Zustand wieder `idle`. |
-| `M.has_done(M)` | Prüft, ob Maschine fertig ist. |
+```
+Eingangslager → R1 → [Belt1 → M1]
+                  ↘  [Belt2 → M2] → R2 → Zwischenlager → R3 → Transport
+```
 
 **Ablauf:**
-1. **Idle:** wartet auf ein neues Teil.  
-2. **Processing:** Bearbeitung läuft; Timer wird reduziert.  
-3. **Done:** Teil fertig, wartet auf Abholung.  
+1. **Eingangslager** generiert kontinuierlich neue Teile
+2. **Roboter R1** entnimmt Teile und verteilt sie **abwechselnd** auf Förderband 1 und 2
+3. **Förderband 1** transportiert Teile zu **Maschine M1**
+4. **Förderband 2** transportiert Teile zu **Maschine M2**
+5. **Maschinen M1/M2** bearbeiten Teile **parallel**
+6. **Roboter R2** entnimmt fertige Teile und legt sie ins **Zwischenlager**
+7. **Roboter R3** verlädt Teile auf den **Transport** (wenn anwesend)
+8. **Transport** kommt periodisch und nimmt verladene Teile mit
 
-**Verwendung:**  
-- Wird durch Roboter oder Scheduler angesteuert.  
-- Rückgabeobjekt enthält stets aktualisierte Stati.
+### ✅ Komponenten
 
-**Weiterentwicklung:**  
-- Einbindung von Qualitätsprüfungen oder Ausschussquote.  
-- Erweiterung um mehrere Prozessmodi (z. B. Warm-up, Fehlerzustand).  
-
----
-
-### 🔹 Datei: `fsm_robot.m`
-
-**Funktion:**  
-Zustandsautomat für **Roboter** mit erweitertem Scheduler-Interface (`on_pick` / `on_place`).  
-Unterstützt verschiedene Rollen:  
-- **R1:** Supply (Einspeisung)  
-- **R2:** Collect (Maschinenentladung)  
-- **R3:** Ship (Versand)
-
-**Parameter:**  
-| Parameter | Bedeutung |
-|------------|------------|
-| `name` | Robotername (z. B. `"R1"`, `"R2"`, `"R3"`) |
-| `C` | Konfiguration (aus `config.m`) |
-
-**Zustände:**
-`idle → move_in → pick → move_to_target → place → idle`
-
-**Ablaufbeschreibung:**
-1. **Idle:** Roboter prüft, ob er ein Teil aufnehmen kann (`can_pick`).  
-2. **Move_in:** fährt zur Aufnahmeposition (Timer `t_move`).  
-3. **Pick:** nimmt Teil auf (`on_pick()`).  
-4. **Move_to_target:** fährt zur Ablageposition.  
-5. **Place:** legt Teil ab (`on_place()`), kehrt danach in `idle` zurück.  
-
-**Events:**  
-- `"move_in"`, `"pick_start"`, `"pick_done"`, `"arrived_target"`, `"place_done"`, `"place_retry"`  
-
-**Statistiken:**  
-- `R.stats.active` – kumulierte aktive Zeit  
-- `R.stats.idle` – kumulierte Wartezeit  
-
-**Verwendung:**  
-- Wird von Scheduler oder Simulationsskripten (z. B. `simulate_factory_line`) aufgerufen.  
-- Nutzt Environment-Strukturen (`envR1`, `envR2`, `envR3`) mit `on_pick`/`on_place`.  
-
-**Weiterentwicklung:**  
-- Erweiterung auf kollaborative Roboterstrategien (z. B. Shared Buffer).  
-- Integration mit realen ROS-Nachrichten für Online-Betrieb.  
-- Erweiterbar für Roboterarme mit inverse Kinematik (`kinematics_3R_planar.m`).  
+| Komponente | Anzahl | Status |
+|------------|--------|--------|
+| **Roboter** | 3 (R1, R2, R3) | ✅ |
+| **Maschinen** | 2 (M1, M2) | ✅ |
+| **Förderbänder** | 2 (Belt1, Belt2) | ✅ |
+| **Eingangslager** | 1 | ✅ |
+| **Zwischenlager** | 1 | ✅ |
+| **Transportmittel** | 1 (periodisch) | ✅ |
 
 ---
 
-## 🧩 Zusammenfassung der Architektur (Core)
+## 🚀 Quickstart
 
-| Komponente | Typ | Hauptverantwortung |
-|-------------|-----|--------------------|
-| `buffer_store` | Datenstruktur | Verwaltung von Zwischenpuffern |
-| `config` | Konfiguration | zentrale Parametrierung der Simulation |
-| `conveyor_model` | Physikalisches Modell | Materialtransport entlang des Bandes |
-| `fsm_machine` | Zustandsautomat | Steuerung einer Maschine |
-| `fsm_robot` | Zustandsautomat | Steuerung eines Roboters |
+### 1. Projekt initialisieren
 
----
+```matlab
+cd digital-twin-factory-line
+startup_project
+```
 
-## 💡 Entwicklerhinweise
-
-- Alle Core-Komponenten sind **zustandsbehaftete Strukturen mit Methoden**,  
-  kompatibel mit der MATLAB-OOP-Syntax, aber leichtgewichtig.  
-- Jeder Zustand (`R.state`, `M.state`) wird in jedem Zeitschritt aktualisiert.  
-- Für Debugging kann `disp(R)` oder `disp(M)` genutzt werden, um Statusänderungen zu verfolgen.
-- `Core/` bildet die Grundlage für Simulationen in `/digital-twin` und `/demos`.  
-
-
-
-## ⚙️ Core/ (Teil 2) – Erweiterte Kernmodule
-
-Der zweite Teil der Core-Komponenten ergänzt die physikalische Simulation um Robotik, Materialerzeugung und Bewegungsmodelle.  
-Diese Module bilden das Bindeglied zwischen Simulation (z. B. `simulate_digital_twin_conveyor_pickplace`) und den realitätsnahen Produktionsmodellen.
+**Was passiert:**
+- Alle Unterordner werden zum MATLAB-Pfad hinzugefügt
+- Konfigurationsdateien werden geladen
+- System ist bereit für Simulation
 
 ---
 
-### 🔹 Datei: `kinematics_3R_planar.m`
+### 2. Standardsimulation starten
 
-**Funktion:**  
-Berechnet die **Vorwärtskinematik eines 3R-Planarroboters** (3 Gelenke, 3 Längen).  
-Der Roboter bewegt sich in einer Ebene (x–y), wodurch alle Gelenkpositionen exakt bestimmt werden können.
+```matlab
+% Simulation mit Standardparametern (120 Sekunden)
+S = simulate_factory_line_3R2M_pflichtenheft();
+```
 
-**Parameter:**
-| Parameter | Bedeutung |
-|------------|------------|
-| `theta` | Gelenkwinkel [rad], Vektor `[t1 t2 t3]` |
-| `L` | Gliederlängen [m], Vektor `[l1 l2 l3]` |
-
-**Rückgabe:**
-| Variable | Beschreibung |
-|-----------|---------------|
-| `P` | Endeffektorposition `[x y]` |
-| `joints` | Koordinaten aller Gelenke `[(0,0); (x1,y1); (x2,y2); (x3,y3)]` |
-
-**Mathematisches Modell:**
-\[
-x_3 = L_1 \cos(t_1) + L_2 \cos(t_1+t_2) + L_3 \cos(t_1+t_2+t_3)
-\]
-\[
-y_3 = L_1 \sin(t_1) + L_2 \sin(t_1+t_2) + L_3 \sin(t_1+t_2+t_3)
-\]
-
-**Verwendung:**  
-- Visualisierung und inverse Kinematik im Rahmen der Robotik-Simulation.  
-- Referenzmodell für Planar-Manipulatoren im Modul Robotiksysteme.  
-
-**Weiterentwicklung:**  
-- Erweiterbar zu 6-DOF-Robotern (seriell oder SCARA).  
-- Integrierbar in reale Steuerungssoftware (ROS/MoveIt).  
+**Ausgabe:**
+```
+=== Simulation abgeschlossen (Pflichtenheft-konform) ===
+Versendete Teile: 45
+Teile auf Belt1: 30, zu M1: 28, von M1: 27
+Teile auf Belt2: 30, zu M2: 27, von M2: 26
+Erfolgsrate: 92.50%
+```
 
 ---
 
-### 🔹 Datei: `material_source.m`
+### 3. Ergebnisse analysieren
 
-**Funktion:**  
-Definiert eine **Materialquelle (Eingangslager)**, die neue Teile generiert.  
-Das System arbeitet deterministisch mit einer festen **Spawn-Rate**.
+```matlab
+% Statistiken anzeigen
+fprintf('Versendete Teile: %d\n', S.stats.parts_from_M1 + S.stats.parts_from_M2);
+fprintf('Erfolgsrate: %.2f%%\n', S.kpi.successRate * 100);
 
-**Parameter:**
-| Parameter | Bedeutung |
-|------------|------------|
-| `rate` | Anzahl erzeugter Teile pro Sekunde (Standard = 0.5 1/s) |
-
-**Rückgabe:**  
-Struktur `S` mit Feldern:
-| Feld | Bedeutung |
-|-------|------------|
-| `.rate` | Spawn-Rate [1/s] |
-| `.acc` | interner Akkumulator für Teil-Generierung |
-| `.next_id` | eindeutige ID-Zählung |
-| `.name` | Name der Quelle (z. B. `"SRC"`) |
-
-**Verwendung:**  
-- Wird von `material_source_step` zyklisch aufgerufen.  
-- Stellt sicher, dass alle Teile eindeutige IDs besitzen.  
+% KPIs anzeigen
+disp(S.kpi);
+```
 
 ---
 
-### 🔹 Datei: `material_source_step.m`
+### 4. Vollständigen Test ausführen
 
-**Funktion:**  
-Erzeugt neue Teile im Eingangspuffer (`buffer_store`) auf Basis der eingestellten Spawn-Rate.  
-Das Modul implementiert den eigentlichen **Zufluss der Materialteile** während der Simulation.
+```matlab
+% Automatischer Test mit Validierung
+test_pflichtenheft
+```
 
-**Parameter:**
-| Parameter | Bedeutung |
-|------------|------------|
-| `S` | Materialquelle (aus `material_source`) |
-| `buf` | Pufferspeicher (aus `buffer_store`) |
-| `dt` | Zeitschritt [s] |
+**Testet:**
+- ✅ Alle Komponenten funktionieren
+- ✅ Materialfluss korrekt
+- ✅ Erfolgsquote ≥ 90%
+- ✅ Stabilität bei 1000+ Teilen
 
-**Ablaufbeschreibung:**
-1. Akkumulation `S.acc += rate * dt`  
-2. Wenn `S.acc ≥ 1.0`, wird ein neues Teil erstellt:  
-   ```matlab
-   part = struct('id', S.next_id, 't_created', datetime("now"), 'pos', 0.0);
+---
 
+## ⚙️ Parameter anpassen
 
+### Verfügbare Parameter
 
+| Parameter | Beschreibung | Standardwert | Einheit |
+|-----------|--------------|--------------|---------|
+| `Tsim` | Simulationszeit | 120 | Sekunden |
+| `dt` | Zeitschrittweite | 0.05 | Sekunden |
+| `spawn_rate` | Materialzufuhr | 0.5 | Teile/s |
+| `belt_speed` | Bandgeschwindigkeit | 0.3 | m/s |
+| `machine_Tproc` | Bearbeitungszeiten | [5.0, 6.0] | Sekunden |
+| `transport_interval` | Transport-Intervall | 20.0 | Sekunden |
+| `transport_hold_time` | Transport-Haltezeit | 5.0 | Sekunden |
+| `showPlots` | Visualisierung | true | boolean |
+| `show3D` | 3D-Visualisierung | false | boolean |
 
+---
 
+### Beispiele für Parameteranpassung
 
+#### Beispiel 1: Längere Simulation mit höherer Materialzufuhr
+
+```matlab
+S = simulate_factory_line_3R2M_pflichtenheft( ...
+    'Tsim', 300, ...              % 5 Minuten Simulation
+    'spawn_rate', 0.8, ...        % 0.8 Teile pro Sekunde
+    'showPlots', true ...
+);
+```
+
+**Effekt:**
+- Mehr Teile werden produziert
+- Höhere Auslastung der Maschinen
+- Längere Warteschlangen möglich
+
+---
+
+#### Beispiel 2: Schnellere Produktion
+
+```matlab
+S = simulate_factory_line_3R2M_pflichtenheft( ...
+    'belt_speed', 0.5, ...        % Schnellere Bänder (0.5 m/s)
+    'machine_Tproc', [3.0, 3.5], ... % Kürzere Bearbeitungszeiten
+    'transport_interval', 10.0 ... % Häufigerer Transport
+);
+```
+
+**Effekt:**
+- Höherer Durchsatz
+- Kürzere Zykluszeiten
+- Bessere Erfolgsquote
+
+---
+
+#### Beispiel 3: Engpass-Analyse
+
+```matlab
+S = simulate_factory_line_3R2M_pflichtenheft( ...
+    'spawn_rate', 1.0, ...        % Hohe Materialzufuhr
+    'machine_Tproc', [8.0, 10.0], ... % Lange Bearbeitungszeiten
+    'transport_interval', 30.0 ... % Seltener Transport
+);
+```
+
+**Effekt:**
+- Puffer füllen sich
+- Maschinen werden zum Engpass
+- Niedrigere Erfolgsquote
+- Gut für Optimierungsanalysen
+
+---
+
+#### Beispiel 4: Ohne Visualisierung (schneller)
+
+```matlab
+S = simulate_factory_line_3R2M_pflichtenheft( ...
+    'Tsim', 600, ...              % 10 Minuten
+    'showPlots', false ...        % Keine Visualisierung
+);
+```
+
+**Effekt:**
+- Simulation läuft deutlich schneller
+- Gut für Batch-Analysen
+- Ideal für Design of Experiments (DoE)
+
+---
+
+## 📊 KPI-Erklärung (Key Performance Indicators)
+
+### Übersicht der KPIs
+
+Nach jeder Simulation erhalten Sie eine Struktur `S.kpi` mit folgenden Kennzahlen:
+
+```matlab
+S.kpi
+```
+
+---
+
+### 1. **successRate** (Erfolgsquote)
+
+**Bedeutung:** Anteil der erfolgreich versendeten Teile an allen erzeugten Teilen
+
+**Formel:**
+```
+successRate = versendete_Teile / erzeugte_Teile
+```
+
+**Interpretation:**
+- **≥ 90%** = ✅ Sehr gut (Pflichtenheft-Ziel erreicht)
+- **70-90%** = ⚠️ Akzeptabel (Optimierung möglich)
+- **< 70%** = ❌ Problematisch (Engpässe vorhanden)
+
+**Beispiel:**
+```matlab
+fprintf('Erfolgsquote: %.2f%%\n', S.kpi.successRate * 100);
+% Ausgabe: Erfolgsquote: 92.50%
+```
+
+**Einflussfaktoren:**
+- Materialzufuhr (`spawn_rate`)
+- Bearbeitungszeiten (`machine_Tproc`)
+- Transport-Intervall (`transport_interval`)
+- Simulationszeit (`Tsim`)
+
+---
+
+### 2. **throughput** (Durchsatz)
+
+**Bedeutung:** Anzahl der versendeten Teile pro Zeiteinheit
+
+**Formel:**
+```
+throughput = versendete_Teile / Simulationszeit [Teile/Minute]
+```
+
+**Interpretation:**
+- Höherer Durchsatz = Effizientere Produktion
+- Vergleich mit Ziel-Durchsatz möglich
+
+**Beispiel:**
+```matlab
+fprintf('Durchsatz: %.2f Teile/min\n', S.kpi.throughput);
+% Ausgabe: Durchsatz: 22.50 Teile/min
+```
+
+**Optimierung:**
+- Erhöhen: Schnellere Bänder, kürzere Bearbeitungszeiten
+- Senken: Längere Bearbeitungszeiten, seltener Transport
+
+---
+
+### 3. **utilization** (Auslastung)
+
+**Bedeutung:** Prozentuale Auslastung der Maschinen und Roboter
+
+**Struktur:**
+```matlab
+S.kpi.utilization.M1    % Auslastung Maschine 1
+S.kpi.utilization.M2    % Auslastung Maschine 2
+S.kpi.utilization.R1    % Auslastung Roboter 1
+S.kpi.utilization.R2    % Auslastung Roboter 2
+S.kpi.utilization.R3    % Auslastung Roboter 3
+```
+
+**Formel:**
+```
+utilization = aktive_Zeit / Gesamtzeit
+```
+
+**Interpretation:**
+- **> 80%** = ✅ Hohe Auslastung (effizient)
+- **50-80%** = ⚠️ Mittlere Auslastung (Optimierung möglich)
+- **< 50%** = ❌ Niedrige Auslastung (Ressourcen ungenutzt)
+
+**Beispiel:**
+```matlab
+fprintf('M1 Auslastung: %.1f%%\n', S.kpi.utilization.M1 * 100);
+fprintf('M2 Auslastung: %.1f%%\n', S.kpi.utilization.M2 * 100);
+% Ausgabe: M1 Auslastung: 85.3%
+%          M2 Auslastung: 82.7%
+```
+
+**Analyse:**
+- Niedrige Maschinen-Auslastung → Materialzufuhr erhöhen
+- Niedrige Roboter-Auslastung → Bearbeitungszeiten verkürzen
+
+---
+
+### 4. **cycleTime** (Zykluszeit)
+
+**Bedeutung:** Durchschnittliche Zeit von Teilerzeugung bis Versand
+
+**Formel:**
+```
+cycleTime = Σ(Versandzeit - Erzeugungszeit) / Anzahl_Teile
+```
+
+**Interpretation:**
+- Kürzere Zykluszeit = Schnellere Produktion
+- Wichtig für Just-in-Time-Produktion
+
+**Beispiel:**
+```matlab
+fprintf('Durchschnittliche Zykluszeit: %.1f s\n', S.kpi.cycleTime);
+% Ausgabe: Durchschnittliche Zykluszeit: 45.3 s
+```
+
+**Optimierung:**
+- Reduzieren: Schnellere Bänder, kürzere Bearbeitungszeiten
+- Erhöhen: Längere Bearbeitungszeiten, langsamere Bänder
+
+---
+
+### 5. **picked** und **placed** (Roboter-Aktionen)
+
+**Bedeutung:** Anzahl der Pick- und Place-Operationen aller Roboter
+
+**Beispiel:**
+```matlab
+fprintf('Picks: %d, Places: %d\n', S.kpi.picked, S.kpi.placed);
+% Ausgabe: Picks: 135, Places: 135
+```
+
+**Interpretation:**
+- Sollten idealerweise gleich sein
+- Differenz zeigt Teile in Bearbeitung
+
+---
+
+### 6. **Statistiken** (S.stats)
+
+Zusätzlich zu KPIs gibt es detaillierte Statistiken:
+
+```matlab
+S.stats.parts_to_belt1      % Teile auf Belt1 gelegt
+S.stats.parts_to_belt2      % Teile auf Belt2 gelegt
+S.stats.parts_to_M1         % Teile zu M1 transportiert
+S.stats.parts_to_M2         % Teile zu M2 transportiert
+S.stats.parts_from_M1       % Fertige Teile von M1
+S.stats.parts_from_M2       % Fertige Teile von M2
+```
+
+**Beispiel:**
+```matlab
+fprintf('Belt1: %d → M1: %d → fertig: %d\n', ...
+    S.stats.parts_to_belt1, S.stats.parts_to_M1, S.stats.parts_from_M1);
+% Ausgabe: Belt1: 30 → M1: 28 → fertig: 27
+```
+
+**Analyse:**
+- Differenzen zeigen Teile in Warteschlangen oder Bearbeitung
+- Hilft bei Engpass-Identifikation
+
+---
+
+## 📈 KPI-Optimierung
+
+### Ziel: Erfolgsquote ≥ 90%
+
+**Strategie 1: Materialzufuhr anpassen**
+```matlab
+% Zu niedrig → Maschinen warten
+S = simulate_factory_line_3R2M_pflichtenheft('spawn_rate', 0.3);
+
+% Optimal → Gute Balance
+S = simulate_factory_line_3R2M_pflichtenheft('spawn_rate', 0.5);
+
+% Zu hoch → Puffer füllen sich
+S = simulate_factory_line_3R2M_pflichtenheft('spawn_rate', 1.0);
+```
+
+---
+
+**Strategie 2: Bearbeitungszeiten optimieren**
+```matlab
+% Schnelle Maschinen → Höherer Durchsatz
+S = simulate_factory_line_3R2M_pflichtenheft('machine_Tproc', [3.0, 3.5]);
+
+% Langsame Maschinen → Engpass
+S = simulate_factory_line_3R2M_pflichtenheft('machine_Tproc', [8.0, 10.0]);
+```
+
+---
+
+**Strategie 3: Transport-Frequenz erhöhen**
+```matlab
+% Häufiger Transport → Bessere Erfolgsquote
+S = simulate_factory_line_3R2M_pflichtenheft('transport_interval', 10.0);
+
+% Seltener Transport → Zwischenlager füllt sich
+S = simulate_factory_line_3R2M_pflichtenheft('transport_interval', 30.0);
+```
+
+---
+
+## 📂 Projektstruktur
+
+```
+digital-twin-factory-line/
+├── startup_project.m              # Projekt-Initialisierung
+├── test_pflichtenheft.m           # Automatischer Test
+├── README.md                      # Diese Dokumentation
+│
+├── Core/                          # Kernmodule (9 Dateien)
+│   ├── buffer_store.m             # Pufferverwaltung
+│   ├── config.m                   # Konfiguration
+│   ├── conveyor_model.m           # Förderband-Modell
+│   ├── fsm_machine.m              # Maschinen-Zustandsautomat
+│   ├── fsm_robot.m                # Roboter-Zustandsautomat
+│   ├── material_source.m          # Materialquelle
+│   ├── material_source_step.m     # Material-Generierung
+│   ├── kinematics_3R_planar.m     # Roboterkinematik (optional)
+│   └── plot_source_buffer.m       # Visualisierung (optional)
+│
+├── digital-twin/                  # Hauptsimulation (4 Dateien)
+│   ├── simulate_factory_line_3R2M_pflichtenheft.m  # HAUPTSIMULATION
+│   ├── logger.m                   # Logging
+│   ├── log_event.m                # Event-Logging
+│   ├── run_doe.m                  # Design of Experiments (optional)
+│   └── out/                       # Ausgabeordner
+│
+├── viz/                           # Visualisierung (2 Dateien)
+│   ├── draw_scene_2d_pflichtenheft.m    # 2D-Visualisierung
+│   └── animate_step_pflichtenheft.m     # Animation
+│
+├── kpi/                           # KPI-Berechnung (5 Dateien)
+│   ├── kpi_init.m                 # KPI-Initialisierung
+│   ├── kpi_update.m               # KPI-Aktualisierung
+│   ├── kpi_finalize.m             # KPI-Finalisierung
+│   ├── export_kpi.m               # KPI-Export
+│   └── pm_estimator.m             # Predictive Maintenance (optional)
+│
+└── io/                            # Schnittstellen (3 Dateien)
+    ├── logger.m                   # Logging
+    ├── opcua_write.m              # OPC UA Integration (optional)
+    └── ros_publish.m              # ROS Integration (optional)
+ 
+
+**Gesamt: ~44 relevante Dateien** (aufgeräumt, keine veralteten Versionen)
+
+---
+
+## 🔧 Erweiterte Nutzung
+
+### Design of Experiments (DoE)
+
+Systematische Parametervariation für Optimierung:
+
+```matlab
+% DoE-Analyse durchführen
+run_doe
+```
+
+**Testet automatisch:**
+- Verschiedene Materialzufuhrraten
+- Verschiedene Bearbeitungszeiten
+- Verschiedene Transport-Intervalle
+- Erstellt CSV-Datei mit Ergebnissen
+
+---
+
+### Datenexport
+
+KPIs werden automatisch exportiert nach `digital-twin/out/`:
+
+```matlab
+% Manuelle KPI-Export
+export_kpi(S.kpi, 'digital-twin/out', 'meine_simulation');
+```
+
+**Erstellt:**
+- `meine_simulation_kpi.csv` - KPI-Daten
+- `meine_simulation_kpi.mat` - MATLAB-Daten
+- `meine_simulation_kpi.json` - JSON-Daten
+
+---
+
+### OPC UA Integration (optional)
+
+Daten an OPC UA Server senden:
+
+```matlab
+% Nach Simulation
+opcua_write(S.kpi, 'opc.tcp://localhost:4840');
+```
+
+---
+
+### ROS Integration (optional)
+
+Daten an ROS publizieren:
+
+```matlab
+% Nach Simulation
+ros_publish(S.kpi, '/factory/kpi');
+```
+
+---
+
+## 🎓 Für Studierende
+
+### Typische Aufgaben
+
+1. **Engpass-Analyse:**
+   - Verschiedene Parameter testen
+   - KPIs vergleichen
+   - Optimale Konfiguration finden
+
+2. **Optimierung:**
+   - Erfolgsquote maximieren
+   - Durchsatz erhöhen
+   - Zykluszeit minimieren
+
+3. **Erweiterungen:**
+   - Zusätzliche Maschine hinzufügen
+   - Qualitätskontrolle implementieren
+   - Wartungsintervalle einbauen
+
+---
+
+### Hilfreiche Befehle
+
+```matlab
+% Projekt-Status prüfen
+which config -all
+
+% Alle Funktionen anzeigen
+help simulate_factory_line_3R2M_pflichtenheft
+
+% Visualisierung ohne Simulation
+draw_scene_2d_pflichtenheft(config())
+
+% Snapshot erstellen
+capture_sim_snapshot(S, 'mein_snapshot')
+```
+
+---
+
+## 📚 Weitere Dokumentation
+
+- **AUFRÄUMPLAN.md** - Vollständige Dateianalyse
+- **LÖSCHEMPFEHLUNG.md** - Aufräum-Anleitung
+- **VALIDIERUNGSBERICHT.md** - Bestätigung der Änderungen
+- **Hilfs-Dokumente/** - Zusätzliche Dokumentation
+
+---
+
+## ⚠️ Häufige Probleme
+
+### Problem 1: "Undefined function 'config'"
+
+**Lösung:**
+```matlab
+startup_project  % Pfade neu laden
+```
+
+---
+
+### Problem 2: Niedrige Erfolgsquote (< 90%)
+
+**Lösung:**
+```matlab
+% Längere Simulation
+S = simulate_factory_line_3R2M_pflichtenheft('Tsim', 300);
+
+% Oder häufigerer Transport
+S = simulate_factory_line_3R2M_pflichtenheft('transport_interval', 10);
+```
+
+---
+
+### Problem 3: Simulation zu langsam
+
+**Lösung:**
+```matlab
+% Visualisierung ausschalten
+S = simulate_factory_line_3R2M_pflichtenheft('showPlots', false);
+```
+
+---
+
+## 🎯 Zusammenfassung
+
+**Minimale Nutzung (3 Befehle):**
+```matlab
+startup_project
+S = simulate_factory_line_3R2M_pflichtenheft();
+test_pflichtenheft
+```
+
+**Mit Parametern:**
+```matlab
+S = simulate_factory_line_3R2M_pflichtenheft( ...
+    'Tsim', 180, ...
+    'spawn_rate', 0.8, ...
+    'machine_Tproc', [4.0, 5.0] ...
+);
+```
+
+**KPIs analysieren:**
+```matlab
+fprintf('Erfolgsquote: %.2f%%\n', S.kpi.successRate * 100);
+fprintf('Durchsatz: %.2f Teile/min\n', S.kpi.throughput);
+fprintf('M1 Auslastung: %.1f%%\n', S.kpi.utilization.M1 * 100);
+```
+
+---
+
+**Viel Erfolg mit der Simulation! 🚀**
+
+**Bei Fragen:** Siehe Dokumentation in `Hilfs-Dokumente/` oder `test_pflichtenheft.m` für Beispiele.
+
+---
+
+**Version:** 2.0 (Aufgeräumt)  
+**Datum:** 2025-01-XX  
+**Status:** ✅ Pflichtenheft-konform, teamfähig, vollständig dokumentiert

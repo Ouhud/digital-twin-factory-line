@@ -64,7 +64,7 @@ for i = 1:numel(belt_speeds)
 
         % --- Simulation starten ---
         try
-            S = simulate_factory_line_3R2M(opts);
+            S = simulate_digital_twin_conveyor_pickplace(b, s, opts);
             K = S.kpi;
 
             res(runIdx,:) = {b, s, K.picked, K.placed, K.successRate, K.throughputPM, K.outputRatePS};
